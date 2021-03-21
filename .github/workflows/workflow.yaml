@@ -1,0 +1,16 @@
+name: Trigger Builds
+
+on:
+  push:
+    branches: main
+
+jobs:
+  trigger_build:
+    name: trigger build
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: print sha
+      run: echo ${{ github.sha }}
+          #- name: get commit info
+          #- name: trigger build with commit info
