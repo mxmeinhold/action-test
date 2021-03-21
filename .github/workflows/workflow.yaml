@@ -3,12 +3,6 @@ name: Trigger Builds
 on: 
   release:
     types:
-      - published
-      - unpublished
-      - created
-      - edited
-      - deleted
-      - prereleased
       - released
 
 jobs:
@@ -21,7 +15,21 @@ jobs:
         run: echo ${{ github.sha }};
       - run: echo $GITHUB_EVENT_NAME
         name: print name
-      - run: cat $GITHUB_EVENT_PATH | jq '.'
+      - run: "cat $GITHUB_EVENT_PATH | jq '{ git: { uri: .repository.html_url, ref: .release.tag_name, commit: ${{ github.sha }} } }'"
         name: print raw event
           #- name: get commit info
           #- name: trigger build with commit info
+# git:
+#   uri: "<url to git repository>"
+#   ref: "<optional git reference>"
+#   commit: "<commit hash identifying a specific git commit>"
+#   author:
+#     name: "<author name>"
+#     email: "<author e-mail>"
+#   committer:
+#     name: "<committer name>"
+#     email: "<committer e-mail>"
+#   message: "<commit message>"
+# env: 
+#    - name: "<variable name>"
+#      value: "<variable value>"
