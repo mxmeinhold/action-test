@@ -12,12 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: format payload
-        run: "cat $GITHUB_EVENT_PATH | jq '{ git: { uri: .repository.html_url, ref: \"main\", commit: \"${{ github.sha }}\" } }' > payload.json"
+        run: |
+          cat $GITHUB_EVENT_PATH | jq '{ git: { uri: .repository.html_url, ref: "main", commit: "${{ github.sha }}" } }' > payload.json
+          jq -C '.' payload.json
       - name: trigger build with commit info
         env:
           OKD_BUILD_HOOK: ${{ secrets.OKD_BUILD_HOOK }}
         run: |
-          curl --insecure --header "Content-Type: application/json" --request POST --data @payload.json "$OKD_BUILD_HOOK"
+          curl --insecure --silent --show-error --header "Content-Type: application/json" --request POST --data @payload.json "$OKD_BUILD_HOOK" > curl-out
+          jq -C '.' curl-out || (cat curl-out; false)
+      - name: test success
+        run: |
+          test `jq '.code' curl.out` -lt 400
+          test `jq '.status'` == "Success"
+          jq '.message' | grep -v skipping || true 
+
 
 # {
 #   "kind": "Status",
