@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: print sha
-        run: echo ${{ github.sha }}; echo ${{ github.event }}
+        run: echo ${{ github.sha }};
+      - run: echo $GITHUB_EVENT_NAME
+        name: print name
+      - run: cat $GITHUB_EVENT_PATH | jq '.'
+        name: print raw event
           #- name: get commit info
           #- name: trigger build with commit info
